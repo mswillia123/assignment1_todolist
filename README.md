@@ -7,7 +7,7 @@ Michael Williams
 mswillia@ualberta.ca
 github: https://github.com/mswillia123/assignment1_todolist.git
 
-NOTE: github removed the README formatting on the front page, but it looks fine in RAW or Preview
+***NOTE: github removed the README formatting on the front page, but it looks fine in RAW or Preview***
 
 ***NOTE: a long press/click on a todo list item will bring up the selection menu ***
 
