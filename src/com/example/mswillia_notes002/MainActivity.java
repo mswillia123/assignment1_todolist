@@ -30,152 +30,152 @@ import android.widget.AbsListView.MultiChoiceModeListener;
  
 public class MainActivity extends Activity {
  
-    // Declare Variables
-    private ListView list;
-    private ListViewAdapter listviewadapter;
-    //ListViewAdapter archiveadapter;
-    private TodoList todoList;
-    private TodoList todoArchive;
-    private CombinedList cl;
-    //TodoList inactiveList;
-    //TodoList bothLists;
-    
-    boolean toggleViewMode; //false = Active todo list, true = Archived todo list
+	/*
+	 * MainActivity is the primary view
+	 * Functions: 
+	 * 
+	 * Active todos and archived todos are stored in two TodoList objects.
+	 * Design rationale: to prevent redundant code and an additional activity class, both lists are implemented
+	 * 	within the same view, via swapping of todo list objects into the ListView adapter
+	 * 
+	 * XXX setMultiChoiceModeListener() section (and associated ListViewAdapter class) partially based on tutorial code:
+	 * 		http://www.androidbegin.com/tutorial/android-delete-multiple-selected-items-listview-tutorial/
+	 * XXX setOnItemClickListener() section based on tutorial code:
+	 *		end this portion from http://www.mysamplecode.com/2012/07/android-listview-checkbox-example.html
+	 * XXX email intent code based upon instructor recommended link:
+	 * 		http://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
+	 */
+	
 
-	private InterfaceFileManager todoFileManager;
+    private ListView list;					//UI view containing the todo list to be displayed
+    private ListViewAdapter listviewadapter;//binds the UI list view to the currently selected list (todo or archive)
+    private TodoList todoList;				//active todo list: TodoList object consisting of multiple Todo objects
+    private TodoList todoArchive;			//archived todo list: TodoList object consisting of multiple Todo objects
+    private CombinedList cl;				//CombinedList object consisting of both todo and archive lists, used 
+    										//	primarily for file load and save operations    
+    boolean toggleViewMode; 				//toggle alternates visible todo list based on user menu selection
+    										//	false = Active todo list view, true = Archived todo list view
+
+	private InterfaceFileManager todoFileManager; 	//interface for file manager object, instantiated via 
+													//TodoListFileManager class
     
-    //TodoListFileManager todoFileManager;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // Get the view from listview_main.xml
-        setContentView(R.layout.listview_main);
+        super.onCreate(savedInstanceState);        
+       
+        setContentView(R.layout.listview_main); // main layout view from listview_main.xml
+        
+        //Variable initialization
         cl = new CombinedList();
         todoFileManager = new TodoListFileManager(this);
-        // Locate the ListView in listview_main.xml
-        //ArrayList<Todo> todoList = new ArrayList<Todo>();
         todoList = new TodoList();
         todoArchive = new TodoList();
-        //bothLists = new TodoList();
         toggleViewMode = false;
-    	//bothLists = new TodoList();
-			
-    	//bothLists = todoFileManager.loadTodoList();
 
-        //todoList.setTodoList(todoList) = bothLists.getTodoList();
-        //todoArchive = bothLists.getTodoArchive();
-        //inactiveList = todoArchive;
-        list = (ListView) findViewById(R.id.listViewArchive);
+        list = (ListView) findViewById(R.id.listViewArchive); //ListView that displays current todo list
  
-        // Pass results to ListViewAdapter Class
-        // Tie together array list and listview
+        // Bind active todo list to list view
         listviewadapter = new ListViewAdapter(this, R.layout.listview_item, todoList.getTodoList());
-
-        // Binds the Adapter to the ListView
         list.setAdapter(listviewadapter);
-        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL); //enable multiple selections within list
        
-        //XXX this portion from http://www.mysamplecode.com/2012/07/android-listview-checkbox-example.html
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            // holder.flag.setOnClickListener(new View.OnClickListener() {
-                 public void onItemClick(AdapterView<?> parent, View view,
-                         int position, long id) {
+        	
+        	// Listener observing clicks on list items
+        	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        		// determine whether clicked list item has checkbox checked, and toggle state
             	boolean flag = listviewadapter.getTodoList().get(position).getTodoChecked();
             	listviewadapter.getTodoList().get(position).setTodoChecked(!flag);
-                //Object o = list.getItemAtPosition(position);
-                //prestationEco str=(prestationEco)o;//As you are using Default String Adapter
+            	
+            	//persist changed state to storage via TodoListFileManager class object
                 cl = new CombinedList();            
             	cl.setTodolist(todoList);
             	cl.setTodoarchive(todoArchive);
-                todoFileManager.saveTodoList(cl);
-                //listviewadapter.refresh(todoList.getTodoList());
-                //listviewadapter.notifyDataSetChanged();
-                
-   
-        		list.invalidateViews();
-                //listviewadapter.refresh(todoList.getTodoList());
-
+                todoFileManager.saveTodoList(cl);           
+                //update UI list view and bound data set to reflect checked item changed state
+        		//list.invalidateViews();
         		listviewadapter.notifyDataSetChanged();
-                 }
+        	}
                 
-             });
-        //XXX end this portion from http://www.mysamplecode.com/2012/07/android-listview-checkbox-example.html
+        });
+
         
-        // Capture ListView item click
+        // Long press on a ListView item activates multiple selection listener, with context action bar menu
         list.setMultiChoiceModeListener(new MultiChoiceModeListener() {   	
         	
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                // Capture total checked items
+                // Total number of selected list items
                 final int checkedCount = list.getCheckedItemCount();
-                // Set the CAB title according to total checked items
-                //mode.setTitle(checkedCount + " Selected");
-                // Calls toggleSelection method from ListViewAdapter Class
+                // context action bar indicates number of items selected
+                mode.setTitle(checkedCount + " Selected");
                 
                 listviewadapter.toggleSelection(position);
-                listviewadapter.getTodoList().get(position).setTodoChecked(true);
+                listviewadapter.getTodoList().get(position).setTodoChecked(true); //retrieve checked state from list view
+                
+                // addButton performs dual function:
+                //	1. when editing existing todo text, button text displays "Save" and saves edited text back to list item
+                //	2. all other occasions button text displays "Add" and adds a new todo item to the list
+                // editing of todo text is only available when a single list item is selected
                 Button addButton = (Button) findViewById(R.id.addButtonArchive);
-            	EditText mText = (EditText) findViewById(R.id.editTodoText);
-                if (checkedCount != 1) {
-                	                	
+            	EditText editText = (EditText) findViewById(R.id.editTodoText);            	
+                if (checkedCount != 1) {                	                	
                 		addButton.setText("Add");
-                		mText.setText("");
-                		                	                	
+                		editText.setText("");                		                	                	
                 }
 
-               mode.invalidate();
-               //XXX todoFileManager.saveTodoList(bothLists); //save todo list on change
-               //todoFileManager.saveTodoList(todoList);
+               mode.invalidate(); // force call to onPrepareActionMode(), which updates list view in UI
             }
  
+            // select action based on user selection from context action bar menu
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            	SparseBooleanArray selected = listviewadapter.getSelectedIds();
             	
+            	SparseBooleanArray selected = listviewadapter.getSelectedIds(); // get list of all currently selected list view items       	          	
+            	boolean email_all = false;  
             	
-            	boolean email_all = false;
-            	
+            	// context action bar menu selection
                 switch (item.getItemId()) {
                 
-                case R.id.edit:
 
-                	Button mButton = (Button) findViewById(R.id.addButtonArchive);
-                	EditText mText = (EditText) findViewById(R.id.editTodoText);
+                case R.id.edit:                	
+                    // menu selection: edit existing todo item text
+                    // option only available when a single list item is selected
+                	Button editButton = (Button) findViewById(R.id.addButtonArchive);
+                	EditText editText = (EditText) findViewById(R.id.editTodoText);
                 	
-                	if (selected.size() == 1 ){
-	                	mButton.setText("Save");
+                	if (selected.size() == 1 ){ // single list item must be selected to have edit option
+	                	editButton.setText("Save"); // change button text to "Save", to save edited text
 	                	Todo selection = listviewadapter.getItem(selected.keyAt(0));
-	                	mText.setText(selection.getTodoText().toString());
+	                	editText.setText(selection.getTodoText().toString()); //copy todo text to TextEdit field for editing
 	                	return true;
                 	}
-                	
                 	return false;
                 	
                 	case R.id.delete:
-                	//XXX
-                    // Calls getSelectedIds method from ListViewAdapter Class
-                    //SparseBooleanArray selected = listviewadapter
-                    //        .getSelectedIds();
-                    // Captures all selected ids with a loop
-                    for (int i = (selected.size() - 1); i >= 0; i--) {
-                        if (selected.valueAt(i)) {
-                            Todo selecteditem = listviewadapter
-                                    .getItem(selected.keyAt(i));
-                            // Remove selected items following the ids
-                            listviewadapter.remove(selecteditem);
-                        }
-                    }
-                    cl = new CombinedList();
-                	cl.setTodolist(todoList);
-                	cl.setTodoarchive(todoArchive);
-                    todoFileManager.saveTodoList(cl);
-                    // Close CAB
-                    mode.finish();
-                    return true;
+	                	// menu selection: remove selected items from list view and associated TodoList object
+	                    // loop through selected items and remove
+	                    for (int i = (selected.size() - 1); i >= 0; i--) {
+	                        if (selected.valueAt(i)) {
+	                            Todo selecteditem = listviewadapter.getItem(selected.keyAt(i));
+	                            listviewadapter.remove(selecteditem);
+	                        }
+	                    }
+	                    
+	                    //persist changed state to storage via TodoListFileManager class object
+	                    cl = new CombinedList();
+	                	cl.setTodolist(todoList);
+	                	cl.setTodoarchive(todoArchive);
+	                    todoFileManager.saveTodoList(cl);
+	                    mode.finish(); // exit context action bar mode
+	                    return true;
+	                    
                 case R.id.archive:
-                	// Archive/Unarchive: Move all selected items to currently inactive list
-
+                	// menu selection: Archive/Unarchive: Move all selected items from currently visible
+                	//	todo list to inactive list (menu item text changes from "Archive" to "Unarchive"
+                	//	based upon currently active list
+                	//	loop through selected items and move from one list to the other
                 	for (int i = (selected.size() - 1); i >= 0; i--) {
                         if (selected.valueAt(i)) {
                             Todo selecteditem = listviewadapter.getItem(selected.keyAt(i));
@@ -187,48 +187,45 @@ public class MainActivity extends Activity {
                             }
                         }                        
                     } 
-                	//listviewadapter.removeSelection();
-                	//listviewadapter.notifyDataSetChanged();
-                	
-                	return true;
+                	//persist changed state to storage via TodoListFileManager class object
+                    cl = new CombinedList();
+                	cl.setTodolist(todoList);
+                	cl.setTodoarchive(todoArchive);
+                    todoFileManager.saveTodoList(cl);
+                    mode.finish(); // exit context action bar mode
+                    return true;
+                    
                 case R.id.emailall:
-        			email_all = true; //falls through to case:email to continue
+                	// menu selection: email all todo and archive list items
+        			email_all = true; //flag set, case falls through to case:email for email intent handling
                 case R.id.email:
-                	
+                	// menu selection: email selected items
             		if (selected.size() <= 0) { 
             			Toast.makeText(MainActivity.this, "No items selected", Toast.LENGTH_SHORT).show();
             			return false;
         			}
 
-            		Intent intent = new Intent(Intent.ACTION_SEND);            		
-            		//List<Todo> todolist = listviewadapter.getTodoList();            		
+            		// initialize email intent and string to store todo items
+            		Intent intent = new Intent(Intent.ACTION_SEND);            		         		
             		String fullstring = "Todo list (items: + checked, - unchecked)\n\n";
-
-            		if (email_all) {
+            		// append todo items as strings
+            		if (email_all) { // email all option - all items on both lists
             			Toast.makeText(MainActivity.this, "Emailing All", Toast.LENGTH_SHORT).show();
             			for (Todo todo: todoList.getTodoList()){
-            				if (todo.getTodoChecked()){
-                				fullstring += "+ ";
-                			} else { 
-                				fullstring += "- ";
-                			}
-            				fullstring += todo.getTodoText() + "\n";
-            				
+            				if (todo.getTodoChecked()) { fullstring += "+ ";
+                			} else { fullstring += "- ";}
+            				fullstring += todo.getTodoText() + "\n";            				
             			}
             			fullstring += "\nArchived todos:\n";
             			for (Todo todo: todoArchive.getTodoList()){
-            				if (todo.getTodoChecked()){
-                				fullstring += "+ ";
-                			} else { 
-                				fullstring += "- ";
+            				if (todo.getTodoChecked()){ fullstring += "+ ";
+                			} else { fullstring += "- ";
                 			}
-            				fullstring += todo.getTodoText() + "\n";
-            				
+            				fullstring += todo.getTodoText() + "\n";            				
             			}
-            		} else {
+            		} else { // email selected option - only selected items in currently visible list
 	            		for(int i = 0; i < selected.size(); i++) 
-	            		{
-	                    	
+	            		{	                    	
 	            			Todo todo = listviewadapter.getItem(selected.keyAt(i));
 	            			if (todo.getTodoChecked()){
 	            				fullstring += "+ ";
@@ -236,7 +233,6 @@ public class MainActivity extends Activity {
 	            				fullstring += "- ";
 	            			}
 	            			fullstring += todo.getTodoText() + "\n";
-	
 	            		}
             		}
             		
@@ -248,9 +244,7 @@ public class MainActivity extends Activity {
             		    startActivity(Intent.createChooser(intent, "Send mail..."));
             		} catch (android.content.ActivityNotFoundException ex) {
             		    Toast.makeText(MainActivity.this, "No email clients installed.", Toast.LENGTH_SHORT).show();
-            		}
-               	
-                	
+            		}          	
                 	return true;
 
                 default:
@@ -260,108 +254,58 @@ public class MainActivity extends Activity {
  
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                mode.getMenuInflater().inflate(R.menu.activity_main, menu);
-                              
+            	//intialize context action mode menu
+                mode.getMenuInflater().inflate(R.menu.activity_main, menu);                              
                 return true;
             }
  
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-                // TODO Auto-generated method stub
                 listviewadapter.removeSelection();
             }
  
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            	
-            	//mode.getMenuInflater().inflate(R.menu.activity_main, menu);
-        		final int checkedCount = list.getCheckedItemCount();
+            	// called to refresh context action mode menu
+        		final int checkedCount = list.getCheckedItemCount(); // list of selectes list view items
         		menu.clear();
         		mode.getMenuInflater().inflate(R.menu.activity_main, menu);
-        	   //MenuInflater inflater = getMenuInflater();
-        	   //inflater.inflate(R.menu.activity_main, menu);
-        	    MenuItem item = menu.findItem(R.id.edit);
-        	    //MenuItem item2 = menu.findItem(R.id.archive);
-        	    //MenuItem item2 = menu.findItem(R.id.menu_save);
-        	    if (checkedCount == 1) {
-        	    item.setVisible(true);
-        	    //item2.setVisible(true);
+        		
+        		// hide edit option if more than single list item selected
+        		MenuItem item = menu.findItem(R.id.edit);        	    
+        	    if (checkedCount == 1) { 
+        	    	item.setVisible(true);
         	    } else {
         	    	item.setVisible(false);
-        	    	//item2.setVisible(false);
         	    }
-        	    
+        	    // toggle archive/unarchive menu option based on visible todo list
+        	    item = menu.findItem(R.id.archive);        	    
+        	    if (toggleViewMode){
+        	    	item.setTitle("Unarchive");
+        	    } else{
+        	    	item.setTitle("Archive");
+        	    }     	    
         	    return true;
             }
-        });
+        }); // end of setMultiChoiceListener()
        	
-    }
+    } // end of onCreate()
     
    
 	@Override
 	protected void onStart() {
 		super.onStart();
-		Toast.makeText(this, "Before load", Toast.LENGTH_SHORT).show();
-		//TodoList tl = new TodoList();
-		//int n=1;
+		
+		// load persistent CombinedList (contains todo list and archive list)
 		CombinedList cl = new CombinedList();
-		//todoList = cl.getTodolist();
-		cl = todoFileManager.loadTodoList();
-		//Toast.makeText(this, cl.getTodolist().getTodoList().get(0).toString(), Toast.LENGTH_SHORT).show();
+		cl = todoFileManager.loadTodoList(); 
 		todoList = cl.getTodolist();
-		//Toast.makeText(this, todoList.getTodoList().get(0).getTodoText(), Toast.LENGTH_SHORT).show();
 		todoArchive = cl.getTodoarchive();
-		//String td = todoList.getTodoList().get(0).getTodoText();
-		//Toast.makeText(this, td, Toast.LENGTH_SHORT).show();
+		
+		// set ListViewAdapter to display active todo list on startup
 		listviewadapter = new ListViewAdapter(this, R.layout.listview_item, todoList.getTodoList());
 		list.setAdapter(listviewadapter);
-		//list.invalidateViews();
-        //listviewadapter.refresh(todoList.getTodoList());
-
-		//listviewadapter.notifyDataSetChanged();
-		//list.invalidateViews();
 		
-		//Toast.makeText(this, todo, Toast.LENGTH_SHORT).show();
-		
-		/*
-		String FILENAME = "file5.sav";
-		
-		try {
-			
-			FileOutputStream fileoutputstream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-			ObjectOutputStream objectoutputstream = new ObjectOutputStream(fileoutputstream);
-			objectoutputstream.writeObject(tl);
-			//objectoutputstream.writeObject(todoarchive);
-			//objectoutputstream.writeObject(todolist);
-			//objectoutputstream.writeObject(todoarchive);
-			fileoutputstream.close();
-		} 
-		catch (Exception e) {
-			
-			e.printStackTrace();
-		}
-		
-		tl = new TodoList();
-		//todolist = null;
-		//if (todolist ==  null) {
-			try {
-				FileInputStream fileinputstream = openFileInput(FILENAME);
-				ObjectInputStream objectinputstream = new ObjectInputStream(fileinputstream);
-				tl = (TodoList) objectinputstream.readObject(); //we assume the input file contains Todo items
-				//todoarchive = (TodoList) objectinputstream.readObject();
-				fileinputstream.close();
-			} catch (Exception e) {
-				//Log.i("TodoList", "Input stream is not proper Todo list");
-				//e.printStackTrace();
-			} 
-			
-			todoList = tl;
-		*/
-		
-		//todoArchive = todoFileManager.loadTodoArchive();
-		//tweetsViewAdapter = new ArrayAdapter<Tweet>(this,
-		//		R.layout.list_item, tweets);
-		//oldTweetsList.setAdapter(tweetsViewAdapter);
 	}
     
     
@@ -374,23 +318,24 @@ public class MainActivity extends Activity {
 	
 	public void toggleListView(MenuItem menu) {
 
+		// when called, swap the active todo list and the archive todo list into the ListViewAdaper
+		// for display in UI
+
 		toggleViewMode =  !toggleViewMode;
 		if (toggleViewMode) {
 			listviewadapter = new ListViewAdapter(this, R.layout.listview_item, todoArchive.getTodoList());
 			setTitle("Archived Todo");
-			
+			menu.setTitle("View Todo");
 		} else {
 			listviewadapter = new ListViewAdapter(this, R.layout.listview_item, todoList.getTodoList());
 			setTitle("Todo List");
-		}
-		
-		list.setAdapter(listviewadapter);
-    	
-
+			menu.setTitle("View Archive");
+		}		
+		list.setAdapter(listviewadapter);	
 	}
 	
 	public void summary(MenuItem menu) {
-		
+		//set intent to SummaryActivity and start summary activity, passing todo and archive lists
 		Intent intent = new Intent(MainActivity.this, SummaryActivity.class);
 		intent.putExtra("todolist", todoList);
 		intent.putExtra("todoarchive", todoArchive);
@@ -401,17 +346,19 @@ public class MainActivity extends Activity {
 	
     public void addTodo(View v) {
     	
+    	// if edit mode is active (button indicates "Save") save EditText text to currently displayed
+    	// todo list, otherwise add a new todo to the list
 		EditText newtext = (EditText) findViewById(R.id.editTodoText);
-		Button mButton = (Button) findViewById(R.id.addButtonArchive);
+		Button editButton = (Button) findViewById(R.id.addButtonArchive);
 		
-		if (mButton.getText().toString() == "Save" && list.getCheckedItemCount() == 1) {
-			// if currently editing a todo do this
+		if (editButton.getText().toString() == "Save" && list.getCheckedItemCount() == 1) {
+			// save edit text field text to selected list item
 			SparseBooleanArray selected = listviewadapter.getSelectedIds();
 			listviewadapter.getItem(selected.keyAt(0)).setTodoText(newtext.getText().toString());
 			listviewadapter.notifyDataSetChanged();
 
 		} else {
-			//otherwise add a new todo item	
+			//otherwise add a new todo item	to the current list
 			if (newtext.length() > 0 ) {
 				Todo newtodo = new Todo(false, newtext.getText().toString());
 				listviewadapter.add(newtodo);
@@ -419,6 +366,7 @@ public class MainActivity extends Activity {
 				listviewadapter.notifyDataSetChanged();
 			}
 		}
+		//persist changed state to storage via TodoListFileManager class object
 		cl = new CombinedList();
     	cl.setTodolist(todoList);
     	cl.setTodoarchive(todoArchive);

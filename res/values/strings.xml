@@ -14,7 +14,7 @@
     <string name="action_settings">"action settings"</string>
     <string name="title_activity_archive">ArchiveActivity</string>
     <string name="title_activity_test">TestActivity</string>
-    <string name="toggleListView">Change List</string>
+    <string name="toggleListView">View Archive</string>
     <string name="title_activity_summary">Summary</string>
 
 </resources>
