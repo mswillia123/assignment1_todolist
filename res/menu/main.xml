@@ -1,7 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.androidbegin.multipledeletelistview.MainActivity" >
-    <item android:id="@+id/toggleListView" android:title="@string/toggleListView" android:onClick="toggleListView"></item>
-    <item android:id="@+id/summary" android:title="@string/summary" android:onClick="summary"></item>
-
-</menu>
