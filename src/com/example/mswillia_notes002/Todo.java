@@ -5,42 +5,32 @@ import java.io.Serializable;
 public class Todo implements Serializable{
 	
 	
-    /**
+    /*
 	 * 
 	 */
 	private static final long serialVersionUID = -1610812652116647634L;
-	private String rank;
-    //private String country;
-    //private String population;
-    private boolean flag;
+	private String todoText;
+    private boolean todoChecked;
  
-    public Todo(boolean flag, String rank) { //String country,String population) {
-        this.rank = rank;
-        //this.country = country;
-        //this.population = population;
-        this.flag = flag;
+    public Todo(boolean todoChecked, String todoText) {
+        this.todoText = todoText;
+        this.todoChecked = todoChecked;
     }
  
-	public String getRank() {
-        return rank;
+	public String getTodoText() {
+        return todoText;
     }
  
-    public void setRank(String rank) {
-        this.rank = rank;
+    public void setTodoText(String todoText) {
+        this.todoText = todoText;
     }
  
-    public boolean getFlag() {
-        return flag;
+    public boolean getTodoChecked() {
+        return todoChecked;
     }
     
-    /*
-    public boolean isSelected() {
-        return flag;
-  	}
-  	*/
- 
-    public void setFlag(boolean flag) {
-        this.flag = flag;
+    public void setTodoChecked(boolean todoChecked) {
+        this.todoChecked = todoChecked;
     }
  
 }

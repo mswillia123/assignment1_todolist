@@ -41,11 +41,11 @@ public final class R {
         public static final int editTodoText=0x7f08000c;
         public static final int email=0x7f080012;
         public static final int emailall=0x7f080013;
-        public static final int flag=0x7f08000b;
         public static final int listViewArchive=0x7f08000e;
-        public static final int rank=0x7f08000a;
         public static final int returntolist=0x7f080017;
         public static final int summary=0x7f080016;
+        public static final int todochecked=0x7f08000b;
+        public static final int todotext=0x7f08000a;
         public static final int toggleListView=0x7f080015;
         public static final int unchecked=0x7f080002;
         public static final int uncheckedtext=0x7f080003;

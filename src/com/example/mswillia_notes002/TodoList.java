@@ -40,6 +40,5 @@ public class TodoList implements Serializable{
 		return todoList.size();
 	}
 	
-
 	
 }

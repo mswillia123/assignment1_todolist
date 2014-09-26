@@ -1,80 +1,59 @@
 package com.example.mswillia_notes002;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Context;
 import android.util.Log;
 
 
-public class TodoListFileManager {//implements IDataManager{
-	
-//XXX Class borrowed from Lonely Twitter
-//XXX Have changed variable names and moved functions, but otherwise looks identical
-/*
- * public interface IDataManager {
-	
-	public ArrayList<Todo> loadTodoList();
-	
-	public void saveTodos(List<Todo> todolist);
+public class TodoListFileManager implements InterfaceFileManager{	
 
-}
- * */
+// TodoListFileManager Class implements saving/loading of a single CombinedList object containing the todo list and archive list
+//XXX Portions of class borrowed from CMPUT301 Lonely Twitter lab tutorial XXX
 
-	private static final String FILENAME = "file2.sav";
-	
-	private Context context;
-	
+	private static final String FILENAME = "todolist.sav";
+	private Context context;	
 	
 	public TodoListFileManager(Context context) {
 		this.context = context;
 	}
 	
-	/* working on this right now!! should implement this as separate class file
-	public class bothLists {
-		  private ArrayList<Todo> person = null;
-		  private DataExporterPerson dataExporterPerson = null;
-
-		  //getters and setters.
-		}
-	*/
-	
-	public void saveTodoList(TodoList todolist ) throws IOException {
+	public void saveTodoList(CombinedList cl) {
 		try {
 			
 			FileOutputStream fileoutputstream = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
 			ObjectOutputStream objectoutputstream = new ObjectOutputStream(fileoutputstream);
-			objectoutputstream.writeObject(todolist);
-			//objectoutputstream.writeObject(todolist);
-			//objectoutputstream.writeObject(todoarchive);
+			objectoutputstream.writeObject(cl);
+			objectoutputstream.close();
 			fileoutputstream.close();
 		} 
 		catch (Exception e) {
+			
 			e.printStackTrace();
 		}
 	}
-	
-	public TodoList loadTodoList() throws ClassNotFoundException, IOException {
+	//*/
+	public CombinedList loadTodoList(){ 
 
-		TodoList todolist = new TodoList();
-		todolist = null;
-		
-		try {
-			FileInputStream fileinputstream = context.openFileInput(FILENAME);
-			ObjectInputStream objectinputstream = new ObjectInputStream(fileinputstream);
-			todolist = (TodoList) objectinputstream.readObject(); //we assume the input file contains Todo items
-			//todoarchive = (ArrayList<Todo>) objectinputstream.readObject();
-		} catch (Exception e) {
-			Log.i("TodoList", "Input stream is not proper Todo list");
-			e.printStackTrace();
-		} 
+		CombinedList cl = new CombinedList();
 
-		return todolist;
+			try {
+				FileInputStream fileinputstream = context.openFileInput(FILENAME);
+				ObjectInputStream objectinputstream = new ObjectInputStream(fileinputstream);
+				cl = (CombinedList) objectinputstream.readObject(); //we assume the input file contains a combined todo list
+				objectinputstream.close();
+				fileinputstream.close();
+				
+			} catch (Exception e) {
+				Log.i("TodoList", "Input stream is not proper Todo list");
+				e.printStackTrace();
+			} 
+
+		return  cl;
 	}
 	
 

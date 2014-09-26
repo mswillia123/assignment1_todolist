@@ -4,11 +4,11 @@
     android:layout_height="fill_parent"
     android:background="?android:attr/activatedBackgroundIndicator" >
  
-        
     <TextView
-        android:id="@+id/rank"
+        android:id="@+id/todotext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
 <!--
     <CheckBox
         android:id="@+id/flag"
@@ -17,13 +17,13 @@
         android:layout_alignParentRight="true" 
         android:focusable="false"/>
   -->
+
       <ImageView
-        android:id="@+id/flag"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:background="#000000"
-        android:padding="1dp" />  
-        
+          android:id="@+id/todochecked"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentRight="true"
+          android:background="#000000"
+          android:padding="1dp" />
  
 </RelativeLayout>
