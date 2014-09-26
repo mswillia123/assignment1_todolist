@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.mswillia_notes002.SummaryActivity" >
+
+    <item
+        android:id="@+id/returntolist"
+        android:title="@string/returntolist" android:onClick="returnToList"/>
+
+</menu>
