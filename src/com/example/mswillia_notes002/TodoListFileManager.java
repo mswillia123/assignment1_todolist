@@ -12,7 +12,7 @@ import android.util.Log;
 
 public class TodoListFileManager implements InterfaceFileManager{	
 
-// TodoListFileManager Class implements saving/loading of a single CombinedList object containing the todo list and archive list
+// TodoListFileManager class implements saving/loading of a single CombinedList object containing the todo list and archive list
 //XXX Portions of class borrowed from CMPUT301 Lonely Twitter lab tutorial XXX
 
 	private static final String FILENAME = "todolist.sav";
@@ -36,7 +36,7 @@ public class TodoListFileManager implements InterfaceFileManager{
 			e.printStackTrace();
 		}
 	}
-	//*/
+
 	public CombinedList loadTodoList(){ 
 
 		CombinedList cl = new CombinedList();

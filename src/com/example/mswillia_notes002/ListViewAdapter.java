@@ -17,6 +17,12 @@ import android.widget.ImageView;
 import android.widget.Toast;
  
 public class ListViewAdapter extends ArrayAdapter<Todo> {
+	
+	/*
+	 * ListViewAdapter class manages the todo list data and adapts the data to the MainActivity list view
+	 * A secondary inner ViewHolder class contains a text view and checkbox image view. Multiple selection
+	 * of list items is modeled for interaction with Main Activity listeners.
+	 */
 
     Context context;
     LayoutInflater inflater;
@@ -86,7 +92,6 @@ public class ListViewAdapter extends ArrayAdapter<Todo> {
         
     }
  
-    //used
     public void removeSelection() {
         selectedItems = new SparseBooleanArray();
         notifyDataSetChanged();
@@ -100,30 +105,11 @@ public class ListViewAdapter extends ArrayAdapter<Todo> {
         notifyDataSetChanged();
     }
  
-    /*
-    //not in  use
-    public int getSelectedCount() {
-        return selectedItems.size();
-    }
-    */
-    //used
+
     public SparseBooleanArray getSelectedIds() {
         return selectedItems;
     }
     
-    public void refresh(List<Todo> items)
-    {
-        this.todoList = items;
-        notifyDataSetChanged();
-    } 
     
-    /*
-    public Boolean getToggleViewMode() {
-    	return toggleViewMode;
-    }
-    
-    public Boolean setToggleViewMode() {    	
-    	return !toggleViewMode;
-    }
-	*/
+
 }

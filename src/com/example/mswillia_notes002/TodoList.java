@@ -6,8 +6,10 @@ import java.util.ArrayList;
 
 public class TodoList implements Serializable{
 
-	/**
-	 * 
+	/*
+	 * TodoList class provides methods to set and get full todo lists, and 
+	 * also provides methods to add and remove todo's from the list and
+	 * get the size of the list. 
 	 */
 	private static final long serialVersionUID = -2205661156686002749L;
 	

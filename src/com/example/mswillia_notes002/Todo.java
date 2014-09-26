@@ -6,8 +6,9 @@ public class Todo implements Serializable{
 	
 	
     /*
-	 * 
-	 */
+	Todo class gets and sets todo text and checkbox state
+	*/
+	
 	private static final long serialVersionUID = -1610812652116647634L;
 	private String todoText;
     private boolean todoChecked;

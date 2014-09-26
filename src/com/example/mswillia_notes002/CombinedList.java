@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public class CombinedList implements Serializable {
 	
-	/**
-	 * 
+	/*
+	  CombinedList class combines todo list and archive list into a single object
 	 */
 	private static final long serialVersionUID = 6332734647886032604L;
 	private TodoList todolist;
