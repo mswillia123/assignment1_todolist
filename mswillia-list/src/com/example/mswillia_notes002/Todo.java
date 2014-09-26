@@ -12,7 +12,7 @@ public class Todo implements Serializable{
 	private static final long serialVersionUID = -1610812652116647634L;
 	private String todoText;
     private boolean todoChecked;
- 
+    
     public Todo(boolean todoChecked, String todoText) {
         this.todoText = todoText;
         this.todoChecked = todoChecked;

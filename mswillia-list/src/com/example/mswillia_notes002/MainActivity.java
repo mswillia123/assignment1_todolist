@@ -32,17 +32,36 @@ public class MainActivity extends Activity {
  
 	/*
 	 * MainActivity is the primary view
-	 * Functions: 
-	 * 
 	 * Active todos and archived todos are stored in two TodoList objects.
+	 * Todo list mode - the application starts in this mode.
+	 * List mode has a menu, with summary, and view archive/todo list options.
+	 * Selection mode - a long press/click on any of the todo items activates context action bar selection mode, and allows
+	 * 	for edit, delete, archive/unarchive, and email functions on the selected items
+	 * 
+	 * 	
+	 * Primary functions:
+	 * setOnItemClickListener():
+	 * 	Monitors clicks on individual todos in list
+	 *        
+	 *setMultiChoiceModeListener():
+	 *  Long press on a ListView item activates multiple selection listener, with context action bar menu.
+	 * 	Implements all edit, delete, archive/unarchive, and email functions.
+	 * 
+	 * addTodo():
+	 * 	Implements addition of Todo item to todo list, as well as saving edited todo items.
+	 * 
+	 * summary():
+	 * 	Activates the summary activity via an intent
+	 * 
 	 * Design rationale: to prevent redundant code and an additional activity class, both lists are implemented
 	 * 	within the same view, via swapping of todo list objects into the ListView adapter
 	 * 
-	 * XXX setMultiChoiceModeListener() section (and associated ListViewAdapter class) partially based on tutorial code:
+	 * Source code attribution:
+	 * 	setMultiChoiceModeListener() section (and associated ListViewAdapter class) partially based on tutorial code:
 	 * 		http://www.androidbegin.com/tutorial/android-delete-multiple-selected-items-listview-tutorial/
-	 * XXX setOnItemClickListener() section based on tutorial code:
-	 *		end this portion from http://www.mysamplecode.com/2012/07/android-listview-checkbox-example.html
-	 * XXX email intent code based upon instructor recommended link:
+	 * 	setOnItemClickListener() section based on tutorial code:
+	 *		http://www.mysamplecode.com/2012/07/android-listview-checkbox-example.html
+	 * 	email intent code based upon instructor recommended link:
 	 * 		http://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
 	 */
 	
@@ -71,7 +90,7 @@ public class MainActivity extends Activity {
         todoFileManager = new TodoListFileManager(this);
         todoList = new TodoList();
         todoArchive = new TodoList();
-        toggleViewMode = false;
+        toggleViewMode = false;        
 
         list = (ListView) findViewById(R.id.listViewArchive); //ListView that displays current todo list
  
@@ -79,7 +98,8 @@ public class MainActivity extends Activity {
         listviewadapter = new ListViewAdapter(this, R.layout.listview_item, todoList.getTodoList());
         list.setAdapter(listviewadapter);
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL); //enable multiple selections within list
-       
+
+        
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         	
         	// Listener observing clicks on list items
@@ -301,7 +321,7 @@ public class MainActivity extends Activity {
 		cl = todoFileManager.loadTodoList(); 
 		todoList = cl.getTodolist();
 		todoArchive = cl.getTodoarchive();
-		
+
 		// set ListViewAdapter to display active todo list on startup
 		listviewadapter = new ListViewAdapter(this, R.layout.listview_item, todoList.getTodoList());
 		list.setAdapter(listviewadapter);

@@ -22,8 +22,13 @@ public class ListViewAdapter extends ArrayAdapter<Todo> {
 	 * ListViewAdapter class manages the todo list data and adapts the data to the MainActivity list view
 	 * A secondary inner ViewHolder class contains a text view and checkbox image view. Multiple selection
 	 * of list items is modeled for interaction with Main Activity listeners.
+	 *	
+	 * Source code attribution: ListViewAdapter section (and associated setMultiChoiceModeListener() in MainActivity)
+	 * partially based on tutorial code:
+	 * 		http://www.androidbegin.com/tutorial/android-delete-multiple-selected-items-listview-tutorial/
+	 *
 	 */
-
+	
     Context context;
     LayoutInflater inflater;
     //List<Todo> todoList;
@@ -81,12 +86,12 @@ public class ListViewAdapter extends ArrayAdapter<Todo> {
         notifyDataSetChanged();
     }
  
-    //not in  use
+ 
     public List<Todo> getTodoList() {
         return todoList;
     }
     
-    //used
+    //Toggle selected items
     public void toggleSelection(int position) {
         selectView(position, !selectedItems.get(position));
         
